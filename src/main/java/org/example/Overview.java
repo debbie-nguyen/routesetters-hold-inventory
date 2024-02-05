@@ -61,7 +61,7 @@ public class Overview extends Application {
         stage.setScene(scene);
 
         // set the stage title.
-        stage.setTitle("Routesetting");
+        stage.setTitle("Routesetters Hold Inventory");
 
         //Displaying the contents of the stage
         stage.show();

@@ -21,10 +21,12 @@ public class Inventory {
     }
 
     public String getHoldType() {
+
         return holdType.get();
     }
 
     public void setHoldType(String holdValue) {
+
         holdType.set(holdValue);
     }
 

@@ -21,7 +21,6 @@ public class InventoryTable extends Application {
     // Declare tableData as a field
     private ObservableList<Inventory> tableData;
 
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -34,18 +33,9 @@ public class InventoryTable extends Application {
         showTable(stage);
     }
 
-    @Override
-    public void stop() {
-        // Save data when the application exits
-        saveData();
-    }
-
     private void showTable(Stage stage) {
         Scene scene = new Scene(new BorderPane());
         final Label label = new Label("Inventory of Climbing Holds");
-
-        // Data the TableView displays
-        ObservableList<Inventory> tableData = FXCollections.observableArrayList();
 
         // Create the table
         TableView<Inventory> table = new TableView<>();
@@ -106,29 +96,20 @@ public class InventoryTable extends Application {
         // Button to add a new hold
         Button addButton = new Button("Add");
         addButton.setOnAction(e -> {
-
             Inventory newInventory = new Inventory(addHoldType.getText(), addManufacture.getText(),
                     addMountingOption.getText(), addTexture.getText(), addColor.getText(), addSize.getText());
-
-            // Add the new element to the table data
-            // clears the text field for new entry
             tableData.add(newInventory);
-            addHoldType.clear();
-            addManufacture.clear();
-            addMountingOption.clear();
-            addTexture.clear();
-            addColor.clear();
-            addSize.clear();
+            clearInputFields(addHoldType, addManufacture, addMountingOption, addTexture, addColor, addSize);
+            saveData(); // Save data after adding
         });
 
         // Button to remove a hold
         Button removeButton = new Button("Remove");
         removeButton.setOnAction(e -> {
             Inventory selectedItem = table.getSelectionModel().getSelectedItem();
-
             if (selectedItem != null) {
-                // Remove the item from the list of the displayed holds
                 tableData.remove(selectedItem);
+                saveData(); // Save data after removing
             }
         });
 
@@ -148,9 +129,9 @@ public class InventoryTable extends Application {
 
                 // Remove the item from the list of displayed holds
                 tableData.remove(selectedItem);
+                saveData(); // Save data after editing
             }
         });
-
 
         HBox textFieldInput = new HBox();
         textFieldInput.getChildren().addAll(addHoldType, addManufacture, addMountingOption, addTexture,
@@ -168,7 +149,6 @@ public class InventoryTable extends Application {
         HBox hbox = new HBox();
         hbox.setSpacing(5);
         hbox.setPadding(new Insets(10, 0, 0, 10));
-
 
         // Save button
         Button saveButton = new Button("Save");
@@ -207,9 +187,14 @@ public class InventoryTable extends Application {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                // Assuming your Inventory class has a constructor that accepts the data in the order specified
-                Inventory item = new Inventory(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
-                data.add(item);
+                // Check if the line has enough parts
+                if (parts.length == 6) {
+                    Inventory item = new Inventory(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
+                    data.add(item);
+                } else {
+                    System.err.println("Invalid data format: " + line);
+                    // Handle the invalid data or skip this line
+                }
             }
         } catch (IOException e) {
             System.err.println("Error loading data: " + e.getMessage());
@@ -218,6 +203,7 @@ public class InventoryTable extends Application {
 
         return data;
     }
+
 
     // Save data to the file
     private void saveData() {
@@ -232,16 +218,21 @@ public class InventoryTable extends Application {
                 writer.newLine();
             }
 
+            // Explicitly flush and close the writer
+            writer.flush();
+            writer.close();
+
             System.out.println("Data saved successfully to " + filePath);
         } catch (IOException e) {
             System.err.println("Error saving data: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
+    // Helper method to clear input fields
+    private void clearInputFields(TextField... fields) {
+        for (TextField field : fields) {
+            field.clear();
+        }
+    }
 }
-
-
-
-
-
-
